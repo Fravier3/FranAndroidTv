@@ -1,0 +1,41 @@
+plugins { id 'com.android.application' }
+android {
+ namespace 'com.fran.tv'
+ compileSdk 35
+ defaultConfig {
+  applicationId 'com.fran.tv'; minSdk 23; targetSdk 35
+  versionCode 1; versionName '1.0.0'
+  testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+ }
+ signingConfigs {
+  release {
+   if (System.getenv('FRANTV_KEYSTORE')) {
+    storeFile file(System.getenv('FRANTV_KEYSTORE'))
+    storePassword System.getenv('FRANTV_STORE_PASSWORD')
+    keyAlias 'frantv'
+    keyPassword System.getenv('FRANTV_STORE_PASSWORD')
+   }
+  }
+ }
+ buildTypes {
+  release { signingConfig signingConfigs.release; minifyEnabled false; shrinkResources false }
+ }
+ compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+ buildFeatures { buildConfig true }
+ testOptions { unitTests.includeAndroidResources = true
+ unitTests.all {
+  systemProperty 'robolectric.dependency.repo.url', 'https://repo.maven.apache.org/maven2'
+  def proxy = System.getenv('HTTPS_PROXY')
+  if(proxy) { def uri = new URI(proxy); systemProperty 'https.proxyHost', uri.host; systemProperty 'https.proxyPort', uri.port; systemProperty 'http.proxyHost', uri.host; systemProperty 'http.proxyPort', uri.port }
+ } }
+ lint { abortOnError true; disable 'MissingTranslation' }
+}
+dependencies {
+ implementation 'androidx.media3:media3-exoplayer:1.8.0'
+ implementation 'androidx.media3:media3-exoplayer-hls:1.8.0'
+ implementation 'androidx.media3:media3-exoplayer-dash:1.8.0'
+ implementation 'androidx.media3:media3-ui:1.8.0'
+ implementation 'androidx.core:core:1.15.0'
+ testImplementation 'junit:junit:4.13.2'
+ testImplementation 'org.robolectric:robolectric:4.14.1'
+}
